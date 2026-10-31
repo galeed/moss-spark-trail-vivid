@@ -1,0 +1,442 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f6f3ed;
+  --color-paper-deep: #ece6dc;
+  --color-sidebar: #e4ddd2;
+  --color-ink: #1c1917;
+  --color-muted: #5c564e;
+  --color-line: #d9d0c4;
+  --color-accent: #234137;
+  --color-danger: #8c3b34;
+  --color-danger-soft: #f3e4e0;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", "Iowan Old Style", Palatino, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.5rem;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button,
+  a,
+  input,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 22%, var(--color-paper));
+    color: var(--color-ink);
+  }
+}
+
+.h-app {
+  height: 100dvh;
+}
+
+.pad-safe-t {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pad-safe-b {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.press {
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .press:active {
+    transform: scale(0.98);
+  }
+}
+
+.folio-sidebar {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--color-sidebar);
+  color: var(--color-ink);
+  min-height: 0;
+  overflow: hidden;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 250ms;
+}
+
+@media (max-width: 767px) {
+  .folio-sidebar {
+    inset: 0 auto 0 0;
+    height: 100%;
+  }
+
+  .folio-sidebar:not(.is-open) {
+    visibility: hidden;
+    transform: translateX(-100%);
+  }
+
+  .folio-sidebar.is-open {
+    visibility: visible;
+    transform: translateX(0);
+    transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+  }
+}
+
+@media (min-width: 768px) {
+  .folio-sidebar {
+    position: static;
+    z-index: auto;
+    width: 18rem;
+    flex-shrink: 0;
+    height: auto;
+    visibility: visible;
+    transform: none;
+    border-right: 1px solid var(--color-line);
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folio-sidebar {
+    transition: none;
+  }
+}
+
+.folio-search {
+  width: 100%;
+  height: 2.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+  padding: 0 2.75rem 0 2.4rem;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.folio-search::placeholder {
+  color: var(--color-muted);
+}
+
+.folio-search:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.note-row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.7rem 0.9rem 0.7rem 1rem;
+  text-align: left;
+  color: var(--color-ink);
+}
+
+.note-row::before {
+  content: "";
+  position: absolute;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.note-row[aria-current="true"] {
+  background: var(--color-paper);
+}
+
+.note-row[aria-current="true"]::before {
+  background: var(--color-accent);
+}
+
+.note-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .note-row:hover {
+    background: color-mix(in oklab, var(--color-paper) 70%, var(--color-sidebar));
+  }
+
+  .note-row[aria-current="true"]:hover {
+    background: var(--color-paper);
+  }
+}
+
+.folio-editor {
+  min-height: 0;
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  caret-color: var(--color-ink);
+  overflow: auto;
+  overflow-wrap: break-word;
+}
+
+.folio-editor:focus {
+  outline: none;
+}
+
+.folio-editor::placeholder {
+  color: var(--color-muted);
+  opacity: 0.85;
+}
+
+@media (min-width: 768px) {
+  .folio-editor {
+    font-size: 1.1875rem;
+  }
+}
+
+.folio-empty {
+  color: var(--color-muted);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+}
+
+.md {
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 768px) {
+  .md {
+    font-size: 1.1875rem;
+  }
+}
+
+.md h2,
+.md h3,
+.md h4 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.md h2 {
+  margin: 0 0 0.55em;
+  font-size: 2rem;
+}
+
+.md h3 {
+  margin: 1.15em 0 0.4em;
+  font-size: 1.5rem;
+}
+
+.md h4 {
+  margin: 1.05em 0 0.35em;
+  font-size: 1.25rem;
+}
+
+.md p {
+  margin: 0.75em 0;
+  text-wrap: pretty;
+}
+
+.md a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  text-underline-offset: 0.15em;
+}
+
+.md strong {
+  font-weight: 600;
+}
+
+.md del {
+  color: var(--color-muted);
+}
+
+.md ul,
+.md ol {
+  margin: 0.75em 0;
+  padding-left: 1.25rem;
+}
+
+.md li {
+  margin: 0.28em 0;
+}
+
+.md ul.tasks {
+  list-style: none;
+  padding-left: 0;
+}
+
+.md ul.tasks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.md .tick {
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  place-items: center;
+  margin-top: 0.28rem;
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-paper);
+}
+
+.md .tick svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.md .tick.on {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.md .done {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.md blockquote {
+  margin: 1em 0;
+  padding-left: 1rem;
+  border-left: 2px solid color-mix(in oklab, var(--color-accent) 45%, var(--color-line));
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.md figure {
+  margin: 1em 0;
+}
+
+.md figcaption {
+  margin-bottom: 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  color: var(--color-muted);
+}
+
+.md pre {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-paper-deep);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-style: normal;
+  line-height: 1.55;
+}
+
+.md hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.folio-code {
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-deep);
+  padding: 0.08em 0.35em;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+.md pre .folio-code,
+.md pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.folio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: color-mix(in oklab, var(--color-ink) 32%, transparent);
+  animation: folio-fade 150ms linear both;
+}
+
+.folio-dialog {
+  position: fixed;
+  z-index: 51;
+  left: 50%;
+  top: 50%;
+  width: min(24rem, calc(100% - 2rem));
+  max-height: min(32rem, calc(100% - 2rem));
+  overflow: auto;
+  animation: folio-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes folio-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes folio-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folio-overlay,
+  .folio-dialog {
+    animation: none;
+  }
+
+  .folio-dialog {
+    transform: translate(-50%, -50%);
+  }
+}
